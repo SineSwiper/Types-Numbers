@@ -100,6 +100,9 @@ foreach my $type (@types) {
             numbers_test(-$max-$s, $type, $pass || 0);
          }
       }
+   } or diag explain {
+      name => $name,
+      inline => $type->inline_check('$num'),
    };
 }
 

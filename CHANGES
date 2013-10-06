@@ -1,6 +1,15 @@
 Revision History for Types-Numbers
 ==================================
 
+v0.91 2013-10-06
+----------------
+
+commit c5c1a06b63dda91b2c78ac73818dd238b0ffd252
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Sun Oct 6 16:41:03 2013 -0400
+
+    Fix IntLike with 64-bit safe integers that are still displayed in E notation
+
 ===================================
 End of changes in the last 365 days
 ===================================

@@ -95,7 +95,9 @@ TYPES
   Integers
     "IntLike"
         Behaves like "Int" from Types::Standard, but will also accept
-        blessed number types.
+        blessed number types and integers in E notation. There are no
+        expectations of storage limitations here. (See "SignedInt" for
+        that.)
 
     "PerlSafeInt"
         A Perl (unblessed) integer number than can safely hold the integer

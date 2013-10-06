@@ -1,6 +1,6 @@
 package Types::Numbers;
 
-our $VERSION = '0.90'; # VERSION
+our $VERSION = '0.91'; # VERSION
 # ABSTRACT: Type constraints for numbers
 
 #############################################################################
@@ -96,12 +96,16 @@ my $_NumRange_perlsafe = Type::Tiny->new(
    inlined    => sub { "$_[1] > "._SAFE_NUM_MIN." and $_[1] < "._SAFE_NUM_MAX },
 );
 
+### XXX: This string equality check is necessary because Math::BigInt seems to think 1.5 == 1
 my $_IntLike = $meta->add_type(
    name       => 'IntLike',
    parent     => $_NumLike,
    library    => __PACKAGE__,
-   constraint => sub { /\A-?[0-9]+\z/ },
-   inlined    => sub { $_[1].' =~ /\A-?[0-9]+\z/' },
+   constraint => sub { /\d+/ and int($_) == $_ and int($_) eq $_ },
+   inlined    => sub {
+      my ($self, $val) = @_;
+      $self->parent->inline_check($val)." and $val =~ /\\d+/ and int($val) == $val and int($val) eq $val";
+   },
 );
 
 # This is basically LaxNum with a different parent
@@ -269,7 +273,7 @@ my $_PerlSafeInt = $meta->add_type( Type::Tiny::Intersection->new(
 )->create_child_type(
    name       => 'PerlSafeInt',
    library    => __PACKAGE__,
-   inlined    => sub { "!ref($_[1]) and $_[1] =~ ".'/\\A-?[0-9]+\\z/ and '.$_NumRange_perlsafe->inline_check($_[1]) },
+   inlined    => sub { "!ref($_[1]) and ".$_IntLike->inline_check($_[1]).' and '.$_NumRange_perlsafe->inline_check($_[1]) },
 ) );
 
 my $_BlessedInt = $meta->add_type( Type::Tiny::Intersection->new(
@@ -278,7 +282,7 @@ my $_BlessedInt = $meta->add_type( Type::Tiny::Intersection->new(
 )->create_child_type(
    name       => 'BlessedInt',
    library    => __PACKAGE__,
-   inlined    => sub { Types::Standard::Object->inline_check($_[1]).' and '.$_[1].' =~ /\\A-?[0-9]+\\z/' },
+   inlined    => sub { Types::Standard::Object->inline_check($_[1]).' and '.$_IntLike->inline_check($_[1]) },
    constraint_generator => sub {
       my $self = $Type::Tiny::parameterize_type;
       my $digits = shift;
@@ -348,10 +352,10 @@ $meta->add_type(
    name       => 'UnsignedInt',
    parent     => $_IntLike,
    library    => __PACKAGE__,
-   constraint => sub { /\A[0-9]+\z/ and ($_PerlSafeInt->check($_) or $_BlessedNum->check($_)) },
+   constraint => sub { $_IntLike->check($_) and $_ >= 0 and ($_PerlSafeInt->check($_) or $_BlessedNum->check($_)) },
    inlined    => sub {
       my $val = $_[1];
-      "$val =~ ".'/\A[0-9]+\z/ and ('.
+      $_IntLike->inline_check($val)." and $val >= 0 and (".
          $_NumRange_perlsafe->inline_check($val).' || '.Types::Standard::Object->inline_check($val).
       ')';
    },
@@ -361,10 +365,10 @@ $meta->add_type(
       $bits =~ /\A[0-9]+\z/ or _croak("Parameter to UnsignedInt[`b] expected to be a positive integer; got $bits");
 
       my ($min, $max, $digits) = __integer_bits_vars($bits, 1);
-      my $_BlessedNum_param = $_BlessedNum->parameterize($digits);  # Int check already in RE
+      my $_BlessedNum_param = $_BlessedNum->parameterize($digits);  # IntLike check extracted out
       my $_NumRange_param   = $_NumRange  ->parameterize($min, $max);
 
-      # inline will already have the RE check, and maybe not need the extra NumRange check
+      # inline will already have the IntLike check, and maybe not need the extra NumRange check
       my $perlsafe_inline = $min >= _SAFE_NUM_MIN && $max <= _SAFE_NUM_MAX ?
          sub { Types::Standard::Str->inline_check($_[0]) } :
          sub { '('.Types::Standard::Str->inline_check($_[0]).' and '.$_NumRange_perlsafe->inline_check($_[0]).')' }
@@ -375,15 +379,13 @@ $meta->add_type(
          parent     => $self,
          library    => __PACKAGE__,
          constraint => sub {
-            /\A[0-9]+\z/ and
-            ($_PerlSafeInt->check($_) or $_BlessedNum_param->check($_)) and
-            $_NumRange_param->check($_)
+            $_IntLike->check($_) and $_NumRange_param->check($_) and
+            ($_PerlSafeInt->check($_) or $_BlessedNum_param->check($_));
          },
          inlined    => sub {
             my $val = $_[1];
-            "$val =~ ".'/\A[0-9]+\z/ and '.
-            '('.$perlsafe_inline->($val).' || '.$_BlessedNum_param->inline_check($val).') && '.
-            $_NumRange_param->inline_check($val);
+            $_IntLike->inline_check($val).' and '.$_NumRange_param->inline_check($val).' and '.
+            '('.$perlsafe_inline->($val).' or '.$_BlessedNum_param->inline_check($val).')';
          },
       );
    },
@@ -814,7 +816,8 @@ Like C<NumLike>, but does not accept NaN or Inf.  Closer to the spirit of C<Stri
 
 =item C<< IntLike >>
 
-Behaves like C<Int> from L<Types::Standard>, but will also accept blessed number types.
+Behaves like C<Int> from L<Types::Standard>, but will also accept blessed number types and integers in E notation.  There are no
+expectations of storage limitations here.  (See C<SignedInt> for that.)
 
 =item C<< PerlSafeInt >>
 
