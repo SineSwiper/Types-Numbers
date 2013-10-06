@@ -17,6 +17,8 @@ my @types = (
 
 plan tests => scalar @types;
 
+my %number_cache;
+
 foreach my $type (@types) {
    my $name = $type->display_name;
    $name =~ /^(\w+)\[([\d\,\s]+)\]/;
@@ -31,7 +33,7 @@ foreach my $type (@types) {
    }
 
    subtest $name => sub {
-      plan tests => ($base =~ /Blessed/ ? 61 : 37);
+      plan tests => ($base =~ /Blessed/ ? 62 : 38);
 
       note explain {
          name => $name,
@@ -39,6 +41,7 @@ foreach my $type (@types) {
       };
 
       # Common tests
+      numbers_test( undef, $type, 0);
       numbers_test( 'ABC', $type, 0);
 
       ### TODO: Move to specific limit section
@@ -71,10 +74,14 @@ foreach my $type (@types) {
             my ($test_bits, $test_ebits) = split /_/, $args;
             my $test_sbits = $test_bits - 1 - $test_ebits;  # remove sign bit and exponent bits = significand precision
 
-            # MAX = (2 - 2**(-$sbits-1)) * 2**($ebits-1)
-            my $emax = $bigtwo->copy->bpow($test_ebits-1)->bsub(1);             # Y = (2**($ebits-1)-1)
-            my $smin = $bigtwo->copy->bpow(-$test_sbits-1)->bmul(-1)->badd(2);  # Z = (2 - X) = -X + 2  (where X = 2**(-$sbits-1) )
-            my $max  = $bigtwo->copy->bpow($emax)->bmul($smin);                 # MAX = 2**Y * Z
+            my $max = $number_cache{'Binary'.$args};
+            unless (defined $max) {
+               # MAX = (2 - 2**(-$sbits-1)) * 2**($ebits-1)
+               my $emax = $bigtwo->copy->bpow($test_ebits-1)->bsub(1);             # Y = (2**($ebits-1)-1)
+               my $smin = $bigtwo->copy->bpow(-$test_sbits-1)->bmul(-1)->badd(2);  # Z = (2 - X) = -X + 2  (where X = 2**(-$sbits-1) )
+               $max = $bigtwo->copy->bpow($emax)->bmul($smin);                 # MAX = 2**Y * Z
+               $number_cache{$args} = $max;
+            }
 
             # -1 = global fail, 0 = use detail below, 1 = global pass
             my $pass = $bits <=> $test_bits;
@@ -90,7 +97,10 @@ foreach my $type (@types) {
          foreach my $args (qw(3_48 7_96 8_192 16_384 21_1536 34_6144)) {
             my ($test_digits, $test_emax) = split /_/, $args;
 
-            my $max = $bigten->copy->bpow($test_emax)->bmul( '9.'.('9' x ($test_digits-1)) );
+            my $max = $number_cache{'Decimal'.$args};
+            unless (defined $max) {
+               $max = $number_cache{$args} = $bigten->copy->bpow($test_emax)->bmul( '9.'.('9' x ($test_digits-1)) );
+            }
 
             # -1 = global fail, 0 = use detail below, 1 = global pass
             my $pass = $digits <=> $test_digits;

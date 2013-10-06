@@ -1,0 +1,315 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Types::Numbers - Type constraints for numbers
+
+=head1 DESCRIPTION
+
+Because we deal with numbers every day in our programs and modules, this is an extensive L<Type::Tiny> library of number validations.
+Like L<Type::Tiny>, these types work with all modern OO platforms and as a standalone type system.
+
+=encoding utf8
+
+=head1 TYPES
+
+=head2 Overview
+
+All of these types strive for the accurate storage and validation of many different types of numbers, including some storage types
+that Perl doesn't natively support.
+
+The hierarchy of the types is as follows:
+
+    (T:S = From Types::Standard)
+ 
+    Item (T:S)
+       Defined (T:S)
+          NumLike
+             NumRange[`n, `p]
+             IntLike
+                SignedInt[`b]
+                UnsignedInt[`b]
+             PerlNum
+                PerlSafeInt
+                PerlSafeFloat
+             BlessedNum[`d]
+                BlessedInt[`d]
+                BlessedFloat[`d]
+             NaN
+             Inf[`s]
+             FloatSafeNum
+                FloatBinary[`b, `e]
+                FloatDecimal[`d, `e]
+             RealNum
+                RealSafeNum
+                   FixedBinary[`b, `s]
+                   FixedDecimal[`d, `s]
+ 
+          Value (T:S)
+             Str (T:S)
+                Char[`b]
+
+=head2 Basic types
+
+=over
+
+=item C<< NumLike >>
+
+Behaves like C<LaxNum> from L<Types::Standard>, but will also accept blessed number types.  Unlike C<StrictNum>, it will accept C<NaN>
+and C<Inf> numbers.
+
+=item C<< NumRange[`n, `p] >>
+
+Only accepts numbers within a certain range.  The two parameters are the minimums and maximums, inclusive.
+
+=item C<< PerlNum >>
+
+Exactly like C<LaxNum>, but with a different parent.  Only accepts unblessed numbers.
+
+=item C<< BlessedNum >>
+
+Only accepts blessed numbers.  A blessed number would be using something like L<Math::BigInt> or L<Math::BigFloat>.  It doesn't
+directly C<isa> check those classes, just that the number is blessed.
+
+=item C<< BlessedNum[`d] >>
+
+A blessed number that supports at least certain amount of digit accuracy.  The blessed number must support the C<accuracy> or
+C<div_scale> method.
+
+For example, C<< BlessedNum[40] >> would work for the default settings of L<Math::BigInt>, and supports numbers at least as big as
+128-bit integers.
+
+=item C<< NaN >>
+
+A "not-a-number" value, either embedded into the Perl native float or a blessed C<NaN>, checked via C<is_nan>.
+
+=item C<< Inf >>
+
+An infinity value, either embedded into the Perl native float or a blessed C<Inf>, checked via C<is_inf>.
+
+=item C<< Inf[`s] >>
+
+   Inf['+']
+   Inf['-']
+
+An infinity value with a certain sign, either embedded into the Perl native float or a blessed C<Inf>, checked via C<is_inf>.  The
+parameter must be a plus or minus character.
+
+=item C<< RealNum >>
+
+Like C<NumLike>, but does not accept NaN or Inf.  Closer to the spirit of C<StrictNum>, but accepts blessed numbers as well.
+
+=back
+
+=head2 Integers
+
+=over
+
+=item C<< IntLike >>
+
+Behaves like C<Int> from L<Types::Standard>, but will also accept blessed number types.
+
+=item C<< PerlSafeInt >>
+
+A Perl (unblessed) integer number than can safely hold the integer presented.  This varies between 32-bit and 64-bit versions of Perl.
+
+For example, for most 32-bit versions of Perl, the largest integer than can be safely held in a 4-byte NV (floating point number) is
+C<18446744073709551614>.  Numbers can go higher than that, but due to the NV's mantissa length (accuracy), information is lost beyond
+this point.
+
+In this case, C<...614> would pass and C<...615> would fail.
+
+(Technically, the max integer is C<...615>, but we can't tell the difference between C<...615> and C<...616>, so the cut
+off point is C<...614>, inclusive.)
+
+=item C<< BlessedInt >>
+
+A blessed number than is holding an integer.  (A L<Math::BigFloat> with an integer value would still pass.)
+
+=item C<< BlessedInt[`d] >>
+
+A blessed number holding an integer of at most C<`d> digits (inclusive).  The blessed number container must also have digit accuracy
+to support this number.  (See C<< BlessedNum[`d] >>.)
+
+=item C<< SignedInt >>
+
+A signed integer (blessed or otherwise) that can safely hold its own number.  This is different than C<IntLike>, which doesn't check
+for storage limitations.
+
+=item C<< SignedInt[`b] >>
+
+A signed integer that can hold a C<`b> bit number and is within those boundaries.  One bit is reserved for the sign, so the max limit
+on a 32-bit integer is actually C<< 2**31-1 >> or C<2147483647>.
+
+=item C<< UnsignedInt >>
+
+Like C<SignedInt>, but with a minimum boundary of zero.
+
+=item C<< UnsignedInt[`b] >>
+
+Like C<< SignedInt[`b] >>, but for unsigned integers.  Also, unsigned integers gain their extra bit, so the maximum is twice as high.
+
+=back
+
+=head2 Floating-point numbers
+
+=over
+
+=item C<< PerlSafeFloat >>
+
+A Perl native float that is in the "integer safe" range, or is a NaN/Inf value.
+
+This doesn't guarantee that every single fractional number is going to retain all of its information here.  It only guarantees that
+the whole number will be retained, even if the fractional part is partly or completely lost.
+
+=item C<< BlessedFloat >>
+
+A blessed number that will support fractional numbers.  A L<Math::BigFloat> number will pass, whereas a L<Math::BigInt> number will
+fail.  However, if that L<Math::BigInt> number is capable of upgrading to a L<Math::BigFloat>, it will pass.
+
+=item C<< BlessedFloat[`d] >>
+
+A float-capable blessed number that supports at least certain amount of digit accuracy.  The number itself is not boundary checked, as
+it is excessively difficult to figure out the exact dimensions of a floating point number.  It would also not be useful for numbers
+like C<0.333333...> to fail checks.
+
+=item C<< FloatSafeNum >>
+
+A Union of C<PerlSafeFloat> and C<BlessedFloat>.  In other words, a float-capable number with some basic checks to make sure
+information is retained.
+
+=item C<< FloatBinary[`b, `e] >>
+
+A floating-point number that can hold a C<`b> bit number with C<`e> bits of exponent, and is within those boundaries (or is NaN/Inf).
+The bit breakdown follows traditional IEEE 754 floating point standards.  For example:
+
+   FloatBinary[32, 8] =
+      32 bits total (`b)
+      23 bit  mantissa (significand precision)
+       8 bit  exponent (`e)
+       1 bit  sign (+/-)
+
+Unlike the C<*Int> types, if Perl's native number cannot support all dimensions of the floating-point number without losing
+information, then unblessed numbers are completely off the table.  For example, assuming a 32-bit machine:
+
+   UnsignedInt[64]->check( 0 )        # pass
+   UnsignedInt[64]->check( 2 ** 30 )  # pass
+   UnsignedInt[64]->check( 2 ** 60 )  # fail, because 32-bit NVs can't safely hold it
+
+   FloatBinary[64, 11]->check( 0 )    # fail
+   FloatBinary[64, 11]->check( $any_unblessed_number )  # fail
+
+=item C<< FloatDecimal[`d, `e] >>
+
+A floating-point number that can hold a C<`d> digit number with C<`e> digits of exponent.  Modeled after the IEEE 754 "decimal" float.
+Rejects all Perl NVs that won't support the dimensions.  (See C<< FloatBinary[`b, `e] >>.)
+
+=back
+
+=head2 Fixed-point numbers
+
+=over
+
+=item C<< RealSafeNum >>
+
+Like C<FloatSafeNum>, but rejects any NaN/Inf.
+
+=item C<< FixedBinary[`b, `s] >>
+
+A fixed-point number, represented as a C<`b> bit integer than has been shifted by C<`s> digits.  For example, a
+C<< FixedBinary[32, 4] >> has a max of C<< 2**31-1 / 10**4 = 214748.3647 >>.  Because integers do not hold NaN/Inf, this type fails
+on those.
+
+Otherwise, it has the same properties and caveats as the parameterized C<< Float* >> types.
+
+=item C<< FixedDecimal[`d, `s] >>
+
+Like C<< FixedBinary[`b, `s] >>, but for a C<`d> digit integer.  Or, you could think of C<`d> and C<`s> as accuracy (significant
+figures) and decimal precision, respectively.
+
+=back
+
+=head2 Characters
+
+Characters are basically encoded numbers, so there's a few types here.  If you need types that handle multi-length strings, you're
+better off using L<Types::Encoding>.
+
+=over
+
+=item C<< Char >>
+
+A single character.  Unicode is supported, but it must be decoded first.  A multi-byte character that Perl thinks is two separate
+characters will fail this type.
+
+=item C<< Char[`b] >>
+
+A single character that fits within C<`b> bits.  Unicode is supported, but it must be decoded first.
+
+Also, be aware of the ambiguous nature of 8-bit ASCII characters vs. UTF8:
+
+   use Encode qw(encode decode);
+
+   my $char = 'ђ';
+   Char[8]->check($char);   # pass
+   print ord($char);        # 209
+
+   $char = decode("UTF-8", $char);
+   Char[8]->check($char);   # fail
+   print ord($char);        # 1106
+   print $char;             # ђ
+
+To mitigate this effect, consider an intersection with C<Chars> and possibly a C<Decode> coercion (both from L<Types::Encoding>).
+
+=back
+
+=head1 AVAILABILITY
+
+The project homepage is L<https://github.com/SineSwiper/Types-Numbers/wiki>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/Types::Numbers/>.
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Internet Relay Chat
+
+You can get live help by using IRC ( Internet Relay Chat ). If you don't know what IRC is,
+please read this excellent guide: L<http://en.wikipedia.org/wiki/Internet_Relay_Chat>. Please
+be courteous and patient when talking to us, as we might be busy or sleeping! You can join
+those networks/channels and get help:
+
+=over 4
+
+=item *
+
+irc.perl.org
+
+You can connect to the server at 'irc.perl.org' and talk to this person for help: SineSwiper.
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests via L<https://github.com/SineSwiper/Types-Numbers/issues>.
+
+=head1 AUTHOR
+
+Brendan Byrd <BBYRD@CPAN.org>
+
+=head1 CONTRIBUTOR
+
+Brendan Byrd <bbyrd@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Brendan Byrd.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

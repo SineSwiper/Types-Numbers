@@ -2,6 +2,7 @@ package NumbersTest;
 
 use strict;
 use warnings;
+#use Devel::SimpleTrace;
 
 use base 'Exporter';
 
@@ -33,7 +34,6 @@ our @EXPORT = qw(
 
 # configure some basic big number stuff
 Math::BigInt  ->config({
-   upgrade    => 'Math::BigFloat',
    round_mode => 'common',
    trap_nan   => 0,
    trap_inf   => 0,
@@ -81,6 +81,7 @@ our $Fninf = Math::BigFloat->binf('-');
 
 sub numbers_test {
    my ($val, $type, $is_pass) = @_;
+   no warnings 'uninitialized';
    my $class = blessed $val;
 
    # turn -1 into a fail
@@ -112,6 +113,16 @@ sub numbers_test {
       Test::TypeTiny::should_pass($val, $type, $msg) :
       Test::TypeTiny::should_fail($val, $type, $msg)
    ;
-   my $error_msg = $type->validate($val);
+
+   my $error_msg;
+   if ($type->can('validate_explain')) {
+      my $errors = $type->validate_explain($val);
+      $error_msg = join "\n", @{ $type->validate_explain($val) } if ($errors);
+   }
+   else {
+      $error_msg = $type->validate;
+   }
+
    diag $error_msg if ($error_msg && !$result);
+   #diag $error_msg if ($error_msg);
 }

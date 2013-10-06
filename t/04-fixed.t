@@ -28,7 +28,7 @@ foreach my $type (@types) {
    }
 
    subtest $name => sub {
-      plan tests => 40;
+      plan tests => 41;
 
       note explain {
          name => $name,
@@ -36,6 +36,7 @@ foreach my $type (@types) {
       };
 
       # Common tests
+      numbers_test( undef, $type, 0);
       numbers_test( 'ABC', $type, 0);
 
       numbers_test(  $nan, $type, 0);

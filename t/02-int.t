@@ -23,7 +23,7 @@ foreach my $type (@types) {
    $bits = ceil($bits / _BASE2_LOG) if ($base eq 'BlessedInt');  # digits to bits
 
    subtest $name => sub {
-      plan tests => ($base eq 'BlessedInt' ? 14 : 110);
+      plan tests => ($base eq 'BlessedInt' ? 15 : 111);
 
       note explain {
          name => $name,
@@ -31,6 +31,7 @@ foreach my $type (@types) {
       };
 
       # Common tests
+      numbers_test( undef, $type, 0);
       numbers_test( 'ABC', $type, 0);
       numbers_test(   4.5, $type, 0);
       numbers_test(  $nan, $type, 0);
