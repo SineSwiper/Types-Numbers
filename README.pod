@@ -109,7 +109,8 @@ Like C<NumLike>, but does not accept NaN or Inf.  Closer to the spirit of C<Stri
 
 =item C<< IntLike >>
 
-Behaves like C<Int> from L<Types::Standard>, but will also accept blessed number types.
+Behaves like C<Int> from L<Types::Standard>, but will also accept blessed number types and integers in E notation.  There are no
+expectations of storage limitations here.  (See C<SignedInt> for that.)
 
 =item C<< PerlSafeInt >>
 
