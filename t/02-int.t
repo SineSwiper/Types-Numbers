@@ -60,7 +60,6 @@ foreach my $type (@types) {
 
          note "Bits = $test_bits";
 
-
          # -1 = global fail, 0 = use detail below, 1 = global pass
          my $pass = $bits <=> $test_bits;
 
@@ -103,6 +102,9 @@ foreach my $type (@types) {
             numbers_test($upos+1, $type, $pass || 0);
          }
       }
+   } or diag explain {
+      name => $name,
+      inline => $type->inline_check('$num'),
    };
 }
 

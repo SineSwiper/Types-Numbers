@@ -52,6 +52,9 @@ foreach my $bits (4,6,7,8,16,24,32,48,64,9999) {
          my $c = $chars->{$cb};
          char_test($c, $type, $bits >= $cb);
       }
+   } or diag explain {
+      name => $name,
+      inline => $type->inline_check('$num'),
    };
 }
 

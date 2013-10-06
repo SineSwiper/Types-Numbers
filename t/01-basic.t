@@ -140,12 +140,12 @@ foreach my $type (@types) {
       numbers_test(    0, $type, $is_pass);
       numbers_test(    1, $type, $is_pass);
       numbers_test(_SAFE_NUM_MAX-1, $type, $is_pass);
-      numbers_test(_SAFE_NUM_MAX+1, $type, $name =~ /Int|Float|Fixed|RealSafe/ ? 0 : $is_pass);
+      numbers_test(_SAFE_NUM_MAX+1, $type, $name =~ /Int(?!Like)|Float|Fixed|RealSafe/ ? 0 : $is_pass);
 
       $is_pass = $should_pass->{perl} && $should_pass->{sint};
       numbers_test(   -1, $type, $is_pass);
       numbers_test(_SAFE_NUM_MIN+1, $type, $is_pass);
-      numbers_test(_SAFE_NUM_MIN-1, $type, $name =~ /Int|Float|Fixed|RealSafe/ ? 0 : $is_pass);
+      numbers_test(_SAFE_NUM_MIN-1, $type, $name =~ /Int(?!Like)|Float|Fixed|RealSafe/ ? 0 : $is_pass);
 
       $is_pass = $should_pass->{perl} && $should_pass->{float};
       numbers_test(  0.5, $type, $is_pass);
@@ -195,6 +195,9 @@ foreach my $type (@types) {
       $is_pass = $should_pass->{bfloat} && $should_pass->{inf};
       numbers_test($Fpinf, $type, $is_pass);
       numbers_test($Fninf, $type, $is_pass);
+   } or diag explain {
+      name => $name,
+      inline => $type->inline_check('$num'),
    };
 }
 
