@@ -1,8 +1,23 @@
 Revision History for Types-Numbers
 ==================================
 
+v0.91_01 2013-10-09
+-------------------
+
+commit 983ca4623fb57e7f214dc43057b90c656947b9bc
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Wed Oct 9 18:28:29 2013 -0400
+
+    Fix E notation problems with 64-bit integers and $_NumRange_perlsafe
+
 v0.91 2013-10-06
 ----------------
+
+commit e5706e62ec5900a71b00710c55f3a009539e1900
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Sun Oct 6 16:54:13 2013 -0400
+
+    Release v0.91
 
 commit c5c1a06b63dda91b2c78ac73818dd238b0ffd252
 Author: Brendan Byrd <Perl@ResonatorSoft.org>

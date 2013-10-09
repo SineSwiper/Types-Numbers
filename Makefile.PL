@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010001;
+use 5.008008;
 
 use ExtUtils::MakeMaker 6.30;
 
@@ -20,18 +20,25 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Float" => "0.008",
     "Data::Integer" => "0.004",
+    "Math::BigFloat" => "1.59",
+    "Math::BigInt" => "1.88",
     "Type::Library" => "0.008",
     "Type::Tiny" => "0.001",
-    "Types::Standard" => "0.001"
+    "Types::Standard" => "0.001",
+    "constant" => "1.16",
+    "warnings" => "1.05_01"
   },
   "TEST_REQUIRES" => {
+    "IO::Handle" => "1.27_02",
+    "List::Util" => "1.20",
     "Test::CheckDeps" => "0.007",
     "Test::Exception" => "0.27",
     "Test::More" => "0.94",
     "Test::TypeTiny" => "0.001",
-    "Type::Tiny" => 0
+    "Type::Tiny" => 0,
+    "base" => "2.14"
   },
-  "VERSION" => "0.91",
+  "VERSION" => "0.91_01",
   "test" => {
     "TESTS" => "t/*.t"
   }

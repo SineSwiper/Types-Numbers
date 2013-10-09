@@ -35,29 +35,37 @@
          "requires" : {
             "Data::Float" : "0.008",
             "Data::Integer" : "0.004",
+            "Math::BigFloat" : "1.59",
+            "Math::BigInt" : "1.88",
             "Type::Library" : "0.008",
             "Type::Tiny" : "0.001",
             "Types::Standard" : "0.001",
-            "perl" : "v5.10.1"
+            "constant" : "1.16",
+            "perl" : "v5.8.8",
+            "warnings" : "1.05_01"
          }
       },
       "test" : {
          "requires" : {
+            "IO::Handle" : "1.27_02",
+            "List::Util" : "1.20",
             "Test::CheckDeps" : "0.007",
             "Test::Exception" : "0.27",
             "Test::More" : "0.94",
             "Test::TypeTiny" : "0.001",
-            "Type::Tiny" : "0"
+            "Type::Tiny" : "0",
+            "base" : "2.14",
+            "perl" : "5.008009"
          }
       }
    },
    "provides" : {
       "Types::Numbers" : {
          "file" : "lib/Types/Numbers.pm",
-         "version" : "0.91"
+         "version" : "0.91_01"
       }
    },
-   "release_status" : "stable",
+   "release_status" : "testing",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/SineSwiper/Types-Numbers/issues"
@@ -70,7 +78,7 @@
       },
       "x_irc" : "irc://irc.perl.org/#web-simple"
    },
-   "version" : "0.91",
+   "version" : "0.91_01",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.014002"

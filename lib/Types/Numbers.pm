@@ -1,6 +1,6 @@
 package Types::Numbers;
 
-our $VERSION = '0.91'; # VERSION
+our $VERSION = '0.91_01'; # VERSION
 # ABSTRACT: Type constraints for numbers
 
 #############################################################################
@@ -19,6 +19,7 @@ use Types::Standard ();
 
 use Scalar::Util v1.20 (qw(blessed looks_like_number));  # support for overloaded/blessed looks_like_number
 use POSIX 'ceil';
+use Math::BigInt;
 use Math::BigFloat;
 use Data::Float;
 use Data::Integer;
@@ -45,6 +46,8 @@ my $meta = __PACKAGE__->meta;
 
 #############################################################################
 # Framework types
+
+### TODO: Coercions where safe ###
 
 # Moose and Type::Tiny types both don't seem to support Math::Big* = Num.
 # So, we have to start almost from stratch.
@@ -87,13 +90,20 @@ my $_NumRange = $meta->add_type(
    },
 );
 
+# Large 64-bit integers tend to stringify themselves in exponent notation,
+# even though the number is still pristine.  IOW, the numeric form is perfect,
+# but the string form loses information.  This can be a problem for stringified
+# inlines.
+my $SAFE_NUM_MIN_STR = Math::BigInt->new( _SAFE_NUM_MIN )->bstr;
+my $SAFE_NUM_MAX_STR = Math::BigInt->new( _SAFE_NUM_MAX )->bstr;
+
 # we need to optimize out all of the NumLike checks
 my $_NumRange_perlsafe = Type::Tiny->new(
    display_name => "_NumRange_perlsafe",
    parent     => $_NumLike,
    # no equals because MAX+1 = MAX after truncation
    constraint => sub { $_ > _SAFE_NUM_MIN and $_ < _SAFE_NUM_MAX },
-   inlined    => sub { "$_[1] > "._SAFE_NUM_MIN." and $_[1] < "._SAFE_NUM_MAX },
+   inlined    => sub { "$_[1] > ".$SAFE_NUM_MIN_STR." and $_[1] < ".$SAFE_NUM_MAX_STR },
 );
 
 ### XXX: This string equality check is necessary because Math::BigInt seems to think 1.5 == 1
