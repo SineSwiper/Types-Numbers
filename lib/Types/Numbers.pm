@@ -25,11 +25,7 @@ use Data::Float;
 use Data::Integer;
 
 use constant {
-   _BASE2_LOG     => log(2) / log(10),
-   _SAFE_NUM_MIN  => Data::Integer::min_signed_natint   < Data::Float::max_integer * -1 ?
-                     Data::Integer::min_signed_natint   : Data::Float::max_integer * -1,
-   _SAFE_NUM_MAX  => Data::Integer::max_unsigned_natint > Data::Float::max_integer *  1 ?
-                     Data::Integer::max_unsigned_natint : Data::Float::max_integer *  1,
+   _BASE2_LOG => log(2) / log(10),
 };
 
 sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
@@ -41,6 +37,19 @@ no warnings;  # don't warn on type checks
 
 my $bigtwo = Math::BigFloat->new(2);
 my $bigten = Math::BigFloat->new(10);
+
+# Large 64-bit integers tend to stringify themselves in exponent notation,
+# even though the number is still pristine.  IOW, the numeric form is perfect,
+# but the string form loses information.  This can be a problem for stringified
+# inlines.
+my $SAFE_NUM_MIN = Math::BigInt->new(
+   Data::Integer::min_signed_natint   < Data::Float::max_integer * -1 ?
+   Data::Integer::min_signed_natint   : Data::Float::max_integer * -1
+);
+my $SAFE_NUM_MAX = Math::BigInt->new(
+   Data::Integer::max_unsigned_natint > Data::Float::max_integer *  1 ?
+   Data::Integer::max_unsigned_natint : Data::Float::max_integer *  1,
+);
 
 my $meta = __PACKAGE__->meta;
 
@@ -90,20 +99,13 @@ my $_NumRange = $meta->add_type(
    },
 );
 
-# Large 64-bit integers tend to stringify themselves in exponent notation,
-# even though the number is still pristine.  IOW, the numeric form is perfect,
-# but the string form loses information.  This can be a problem for stringified
-# inlines.
-my $SAFE_NUM_MIN_STR = Math::BigInt->new( _SAFE_NUM_MIN )->bstr;
-my $SAFE_NUM_MAX_STR = Math::BigInt->new( _SAFE_NUM_MAX )->bstr;
-
 # we need to optimize out all of the NumLike checks
 my $_NumRange_perlsafe = Type::Tiny->new(
    display_name => "_NumRange_perlsafe",
    parent     => $_NumLike,
    # no equals because MAX+1 = MAX after truncation
-   constraint => sub { $_ > _SAFE_NUM_MIN and $_ < _SAFE_NUM_MAX },
-   inlined    => sub { "$_[1] > ".$SAFE_NUM_MIN_STR." and $_[1] < ".$SAFE_NUM_MAX_STR },
+   constraint => sub { $_ > $SAFE_NUM_MIN and $_ < $SAFE_NUM_MAX },
+   inlined    => sub { "$_[1] > ".$SAFE_NUM_MIN." and $_[1] < ".$SAFE_NUM_MAX },
 );
 
 ### XXX: This string equality check is necessary because Math::BigInt seems to think 1.5 == 1
@@ -379,7 +381,7 @@ $meta->add_type(
       my $_NumRange_param   = $_NumRange  ->parameterize($min, $max);
 
       # inline will already have the IntLike check, and maybe not need the extra NumRange check
-      my $perlsafe_inline = $min >= _SAFE_NUM_MIN && $max <= _SAFE_NUM_MAX ?
+      my $perlsafe_inline = $min >= $SAFE_NUM_MIN && $max <= $SAFE_NUM_MAX ?
          sub { Types::Standard::Str->inline_check($_[0]) } :
          sub { '('.Types::Standard::Str->inline_check($_[0]).' and '.$_NumRange_perlsafe->inline_check($_[0]).')' }
       ;
@@ -948,7 +950,7 @@ figures) and decimal precision, respectively.
 =head2 Characters
 
 Characters are basically encoded numbers, so there's a few types here.  If you need types that handle multi-length strings, you're
-better off using L<Types::Encoding>.
+better off using L<Types::Encodings>.
 
 =over
 
@@ -960,20 +962,5 @@ characters will fail this type.
 =item C<< Char[`b] >>
 
 A single character that fits within C<`b> bits.  Unicode is supported, but it must be decoded first.
-
-Also, be aware of the ambiguous nature of 8-bit ASCII characters vs. UTF8:
-
-   use Encode qw(encode decode);
-
-   my $char = 'ђ';
-   Char[8]->check($char);   # pass
-   print ord($char);        # 209
-
-   $char = decode("UTF-8", $char);
-   Char[8]->check($char);   # fail
-   print ord($char);        # 1106
-   print $char;             # ђ
-
-To mitigate this effect, consider an intersection with C<Chars> and possibly a C<Decode> coercion (both from L<Types::Encoding>).
 
 =back
