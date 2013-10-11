@@ -220,7 +220,7 @@ TYPES
   Characters
     Characters are basically encoded numbers, so there's a few types here.
     If you need types that handle multi-length strings, you're better off
-    using Types::Encoding.
+    using Types::Encodings.
 
     "Char"
         A single character. Unicode is supported, but it must be decoded
@@ -230,23 +230,6 @@ TYPES
     "Char[`b]"
         A single character that fits within "`b" bits. Unicode is supported,
         but it must be decoded first.
-
-        Also, be aware of the ambiguous nature of 8-bit ASCII characters vs.
-        UTF8:
-
-           use Encode qw(encode decode);
-
-           my $char = 'ђ';
-           Char[8]->check($char);   # pass
-           print ord($char);        # 209
-
-           $char = decode("UTF-8", $char);
-           Char[8]->check($char);   # fail
-           print ord($char);        # 1106
-           print $char;             # ђ
-
-        To mitigate this effect, consider an intersection with "Chars" and
-        possibly a "Decode" coercion (both from Types::Encoding).
 
 AVAILABILITY
     The project homepage is

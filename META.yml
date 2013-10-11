@@ -28,7 +28,7 @@ no_index:
 provides:
   Types::Numbers:
     file: lib/Types/Numbers.pm
-    version: 0.91_01
+    version: 0.91_02
 requires:
   Data::Float: 0.008
   Data::Integer: 0.004
@@ -45,7 +45,7 @@ resources:
   bugtracker: https://github.com/SineSwiper/Types-Numbers/issues
   homepage: https://github.com/SineSwiper/Types-Numbers/wiki
   repository: git://github.com/SineSwiper/Types-Numbers.git
-version: 0.91_01
+version: 0.91_02
 x_Dist_Zilla:
   perl:
     version: 5.014002
@@ -81,13 +81,13 @@ x_Dist_Zilla:
       name: '@Author::BBYRD/PodWeaver'
       version: 3.102000
     -
-      class: Dist::Zilla::Plugin::PruneCruft
-      name: '@Author::BBYRD/PruneCruft'
-      version: 4.300039
-    -
       class: Dist::Zilla::Plugin::GitFmtChanges
       name: '@Author::BBYRD/GitFmtChanges'
       version: 0.005
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::BBYRD/PruneCruft'
+      version: 4.300039
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Author::BBYRD/ManifestSkip'
@@ -115,7 +115,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@Author::BBYRD/InstallGuide'
-      version: 1.200000
+      version: 1.200001
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Author::BBYRD/ExecDir'
@@ -129,7 +129,7 @@ x_Dist_Zilla:
           script_finder:
             - ':ExecFiles'
       name: '@Author::BBYRD/Test::Compile'
-      version: 2.033
+      version: 2.034
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Author::BBYRD/PodCoverageTests'
@@ -151,7 +151,7 @@ x_Dist_Zilla:
           script_finder:
             - ':ExecFiles'
       name: '@Author::BBYRD/NoTabsTests'
-      version: 0.04
+      version: 0.05
     -
       class: Dist::Zilla::Plugin::Test::EOL
       name: '@Author::BBYRD/Test::EOL'
@@ -160,6 +160,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
       name: '@Author::BBYRD/Test::CPAN::Meta::JSON'
       version: 0.003
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      name: '@Author::BBYRD/Test::CPAN::Changes'
+      version: 0.008
     -
       class: Dist::Zilla::Plugin::Test::CheckDeps
       name: '@Author::BBYRD/Test::CheckDeps'
@@ -261,7 +265,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       name: '@Author::BBYRD/Git::CheckFor::CorrectBranch'
-      version: 0.006
+      version: 0.007
     -
       class: Dist::Zilla::Plugin::Git::CommitBuild
       name: '@Author::BBYRD/Git::CommitBuild'

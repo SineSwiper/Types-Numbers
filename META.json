@@ -25,6 +25,7 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
             "Test::More" : "0",
             "Test::NoTabs" : "0",
             "Test::Pod" : "1.41",
@@ -62,7 +63,7 @@
    "provides" : {
       "Types::Numbers" : {
          "file" : "lib/Types/Numbers.pm",
-         "version" : "0.91_01"
+         "version" : "0.91_02"
       }
    },
    "release_status" : "testing",
@@ -78,7 +79,7 @@
       },
       "x_irc" : "irc://irc.perl.org/#web-simple"
    },
-   "version" : "0.91_01",
+   "version" : "0.91_02",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.014002"
@@ -124,14 +125,14 @@
             "version" : "3.102000"
          },
          {
-            "class" : "Dist::Zilla::Plugin::PruneCruft",
-            "name" : "@Author::BBYRD/PruneCruft",
-            "version" : "4.300039"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::GitFmtChanges",
             "name" : "@Author::BBYRD/GitFmtChanges",
             "version" : "0.005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Author::BBYRD/PruneCruft",
+            "version" : "4.300039"
          },
          {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
@@ -166,7 +167,7 @@
          {
             "class" : "Dist::Zilla::Plugin::InstallGuide",
             "name" : "@Author::BBYRD/InstallGuide",
-            "version" : "1.200000"
+            "version" : "1.200001"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
@@ -186,7 +187,7 @@
                }
             },
             "name" : "@Author::BBYRD/Test::Compile",
-            "version" : "2.033"
+            "version" : "2.034"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodCoverageTests",
@@ -216,7 +217,7 @@
                }
             },
             "name" : "@Author::BBYRD/NoTabsTests",
-            "version" : "0.04"
+            "version" : "0.05"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::EOL",
@@ -227,6 +228,11 @@
             "class" : "Dist::Zilla::Plugin::Test::CPAN::Meta::JSON",
             "name" : "@Author::BBYRD/Test::CPAN::Meta::JSON",
             "version" : "0.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::CPAN::Changes",
+            "name" : "@Author::BBYRD/Test::CPAN::Changes",
+            "version" : "0.008"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::CheckDeps",
@@ -354,7 +360,7 @@
          {
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch",
             "name" : "@Author::BBYRD/Git::CheckFor::CorrectBranch",
-            "version" : "0.006"
+            "version" : "0.007"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::CommitBuild",
