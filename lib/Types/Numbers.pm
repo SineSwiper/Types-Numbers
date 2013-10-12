@@ -773,141 +773,138 @@ The hierarchy of the types is as follows:
             Str (T:S)
                Char[`b]
 
-=end wikidoc
+== Basic types
 
-=head2 Basic types
+=== NumLike
 
-=over
+Behaves like {LaxNum} from [Types::Standard], but will also accept blessed number types.  Unlike {StrictNum}, it will accept {NaN}
+and {Inf} numbers.
 
-=item C<< NumLike >>
-
-Behaves like C<LaxNum> from L<Types::Standard>, but will also accept blessed number types.  Unlike C<StrictNum>, it will accept C<NaN>
-and C<Inf> numbers.
-
-=item C<< NumRange[`n, `p] >>
+=== NumRange[`n, `p]
 
 Only accepts numbers within a certain range.  The two parameters are the minimums and maximums, inclusive.
 
-=item C<< PerlNum >>
+=== PerlNum
 
-Exactly like C<LaxNum>, but with a different parent.  Only accepts unblessed numbers.
+Exactly like {LaxNum}, but with a different parent.  Only accepts unblessed numbers.
 
-=item C<< BlessedNum >>
+=== BlessedNum
 
-Only accepts blessed numbers.  A blessed number would be using something like L<Math::BigInt> or L<Math::BigFloat>.  It doesn't
-directly C<isa> check those classes, just that the number is blessed.
+Only accepts blessed numbers.  A blessed number would be using something like [Math::BigInt] or [Math::BigFloat].  It doesn't
+directly {isa} check those classes, just that the number is blessed.
 
-=item C<< BlessedNum[`d] >>
+=== BlessedNum[`d]
 
-A blessed number that supports at least certain amount of digit accuracy.  The blessed number must support the C<accuracy> or
-C<div_scale> method.
+A blessed number that supports at least certain amount of digit accuracy.  The blessed number must support the {accuracy} or
+{div_scale} method.
 
-For example, C<< BlessedNum[40] >> would work for the default settings of L<Math::BigInt>, and supports numbers at least as big as
+For example, {BlessedNum[40]} would work for the default settings of [Math::BigInt], and supports numbers at least as big as
 128-bit integers.
 
-=item C<< NaN >>
+=== NaN
 
-A "not-a-number" value, either embedded into the Perl native float or a blessed C<NaN>, checked via C<is_nan>.
+A "not-a-number" value, either embedded into the Perl native float or a blessed {NaN}, checked via {is_nan}.
 
-=item C<< Inf >>
+=== Inf
 
-An infinity value, either embedded into the Perl native float or a blessed C<Inf>, checked via C<is_inf>.
+An infinity value, either embedded into the Perl native float or a blessed {Inf}, checked via {is_inf}.
 
-=item C<< Inf[`s] >>
+=== Inf[`s]
 
    Inf['+']
    Inf['-']
 
-An infinity value with a certain sign, either embedded into the Perl native float or a blessed C<Inf>, checked via C<is_inf>.  The
+An infinity value with a certain sign, either embedded into the Perl native float or a blessed {Inf}, checked via {is_inf}.  The
 parameter must be a plus or minus character.
 
-=item C<< RealNum >>
+=== RealNum
 
-Like C<NumLike>, but does not accept NaN or Inf.  Closer to the spirit of C<StrictNum>, but accepts blessed numbers as well.
+Like [/NumLike], but does not accept NaN or Inf.  Closer to the spirit of {StrictNum}, but accepts blessed numbers as well.
 
-=back
+== Integers
 
-=head2 Integers
+=== IntLike
 
-=over
+Behaves like {Int} from [Types::Standard], but will also accept blessed number types and integers in E notation.  There are no
+expectations of storage limitations here.  (See [/SignedInt] for that.)
 
-=item C<< IntLike >>
-
-Behaves like C<Int> from L<Types::Standard>, but will also accept blessed number types and integers in E notation.  There are no
-expectations of storage limitations here.  (See C<SignedInt> for that.)
-
-=item C<< PerlSafeInt >>
+=== PerlSafeInt
 
 A Perl (unblessed) integer number than can safely hold the integer presented.  This varies between 32-bit and 64-bit versions of Perl.
 
 For example, for most 32-bit versions of Perl, the largest integer than can be safely held in a 4-byte NV (floating point number) is
-C<18446744073709551614>.  Numbers can go higher than that, but due to the NV's mantissa length (accuracy), information is lost beyond
+{9007199254740992}.  Numbers can go higher than that, but due to the NV's mantissa length (accuracy), information is lost beyond
 this point.
 
-In this case, C<...614> would pass and C<...615> would fail.
+In this case, {...992} would pass and {...993} would fail.
 
-(Technically, the max integer is C<...615>, but we can't tell the difference between C<...615> and C<...616>, so the cut
-off point is C<...614>, inclusive.)
+(Technically, the max integer is {...993}, but we can't tell the difference between {...993} and {...994}, so the cut
+off point is {...992}, inclusive.)
 
-=item C<< BlessedInt >>
+Be aware that Perls compiled with "long doubles" have a unique problem with storage and information loss: their number form maintains
+accuracy while their stringified form loses information.  For example, take the max safe integer for a long double:
 
-A blessed number than is holding an integer.  (A L<Math::BigFloat> with an integer value would still pass.)
+   $num = 18446744073709551615;
+   say $num;  # 1.84467440737095516e+19
+   say $num == 18446744073709551615;  # true, so the full number is still there
 
-=item C<< BlessedInt[`d] >>
+These numbers are considered safe for storage.  If this is not preferred, consider a simple {/e/} check for stringified E notation.
 
-A blessed number holding an integer of at most C<`d> digits (inclusive).  The blessed number container must also have digit accuracy
-to support this number.  (See C<< BlessedNum[`d] >>.)
+=== BlessedInt
 
-=item C<< SignedInt >>
+A blessed number than is holding an integer.  (A [Math::BigFloat] with an integer value would still pass.)
 
-A signed integer (blessed or otherwise) that can safely hold its own number.  This is different than C<IntLike>, which doesn't check
+=== BlessedInt[`d]
+
+A blessed number holding an integer of at most {`d} digits (inclusive).  The blessed number container must also have digit accuracy
+to support this number.  (See [/BlessedNum[`d]].)
+
+=== SignedInt
+
+A signed integer (blessed or otherwise) that can safely hold its own number.  This is different than {IntLike}, which doesn't check
 for storage limitations.
 
-=item C<< SignedInt[`b] >>
+=== SignedInt[`b]
 
-A signed integer that can hold a C<`b> bit number and is within those boundaries.  One bit is reserved for the sign, so the max limit
-on a 32-bit integer is actually C<< 2**31-1 >> or C<2147483647>.
+A signed integer that can hold a {`b} bit number and is within those boundaries.  One bit is reserved for the sign, so the max limit
+on a 32-bit integer is actually {2**31-1} or {2147483647}.
 
-=item C<< UnsignedInt >>
+=== UnsignedInt
 
-Like C<SignedInt>, but with a minimum boundary of zero.
+Like [/SignedInt], but with a minimum boundary of zero.
 
-=item C<< UnsignedInt[`b] >>
+=== UnsignedInt[`b]
 
-Like C<< SignedInt[`b] >>, but for unsigned integers.  Also, unsigned integers gain their extra bit, so the maximum is twice as high.
+Like [/SignedInt[`b]], but for unsigned integers.  Also, unsigned integers gain their extra bit, so the maximum is twice as high.
 
-=back
+== Floating-point numbers
 
-=head2 Floating-point numbers
-
-=over
-
-=item C<< PerlSafeFloat >>
+=== PerlSafeFloat
 
 A Perl native float that is in the "integer safe" range, or is a NaN/Inf value.
 
 This doesn't guarantee that every single fractional number is going to retain all of its information here.  It only guarantees that
 the whole number will be retained, even if the fractional part is partly or completely lost.
 
-=item C<< BlessedFloat >>
+=== BlessedFloat
 
-A blessed number that will support fractional numbers.  A L<Math::BigFloat> number will pass, whereas a L<Math::BigInt> number will
-fail.  However, if that L<Math::BigInt> number is capable of upgrading to a L<Math::BigFloat>, it will pass.
+A blessed number that will support fractional numbers.  A [Math::BigFloat] number will pass, whereas a [Math::BigInt] number will
+fail.  However, if that [Math::BigInt] number is capable of upgrading to a [Math::BigFloat], it will pass.
 
-=item C<< BlessedFloat[`d] >>
+=== BlessedFloat[`d]
 
 A float-capable blessed number that supports at least certain amount of digit accuracy.  The number itself is not boundary checked, as
 it is excessively difficult to figure out the exact dimensions of a floating point number.  It would also not be useful for numbers
-like C<0.333333...> to fail checks.
+like {0.333333...} to fail checks.
 
-=item C<< FloatSafeNum >>
+=== FloatSafeNum
 
-A Union of C<PerlSafeFloat> and C<BlessedFloat>.  In other words, a float-capable number with some basic checks to make sure
+A Union of [/PerlSafeFloat] and [/BlessedFloat].  In other words, a float-capable number with some basic checks to make sure
 information is retained.
 
-=item C<< FloatBinary[`b, `e] >>
+=== FloatBinary[`b, `e]
 
-A floating-point number that can hold a C<`b> bit number with C<`e> bits of exponent, and is within those boundaries (or is NaN/Inf).
+A floating-point number that can hold a {`b} bit number with {`e} bits of exponent, and is within those boundaries (or is NaN/Inf).
 The bit breakdown follows traditional IEEE 754 floating point standards.  For example:
 
    FloatBinary[32, 8] =
@@ -916,7 +913,7 @@ The bit breakdown follows traditional IEEE 754 floating point standards.  For ex
        8 bit  exponent (`e)
        1 bit  sign (+/-)
 
-Unlike the C<*Int> types, if Perl's native number cannot support all dimensions of the floating-point number without losing
+Unlike the {*Int} types, if Perl's native number cannot support all dimensions of the floating-point number without losing
 information, then unblessed numbers are completely off the table.  For example, assuming a 32-bit machine:
 
    UnsignedInt[64]->check( 0 )        # pass
@@ -926,50 +923,42 @@ information, then unblessed numbers are completely off the table.  For example, 
    FloatBinary[64, 11]->check( 0 )    # fail
    FloatBinary[64, 11]->check( $any_unblessed_number )  # fail
 
-=item C<< FloatDecimal[`d, `e] >>
+=== FloatDecimal[`d, `e]
 
-A floating-point number that can hold a C<`d> digit number with C<`e> digits of exponent.  Modeled after the IEEE 754 "decimal" float.
-Rejects all Perl NVs that won't support the dimensions.  (See C<< FloatBinary[`b, `e] >>.)
+A floating-point number that can hold a {`d} digit number with {`e} digits of exponent.  Modeled after the IEEE 754 "decimal" float.
+Rejects all Perl NVs that won't support the dimensions.  (See [/FloatBinary[`b, `e]].)
 
-=back
+== Fixed-point numbers
 
-=head2 Fixed-point numbers
+=== RealSafeNum
 
-=over
+Like [/FloatSafeNum], but rejects any NaN/Inf.
 
-=item C<< RealSafeNum >>
+=== FixedBinary[`b, `s]
 
-Like C<FloatSafeNum>, but rejects any NaN/Inf.
-
-=item C<< FixedBinary[`b, `s] >>
-
-A fixed-point number, represented as a C<`b> bit integer than has been shifted by C<`s> digits.  For example, a
-C<< FixedBinary[32, 4] >> has a max of C<< 2**31-1 / 10**4 = 214748.3647 >>.  Because integers do not hold NaN/Inf, this type fails
+A fixed-point number, represented as a {`b} bit integer than has been shifted by {`s} digits.  For example, a
+{FixedBinary[32, 4]} has a max of {2**31-1 / 10**4 = 214748.3647}.  Because integers do not hold NaN/Inf, this type fails
 on those.
 
-Otherwise, it has the same properties and caveats as the parameterized C<< Float* >> types.
+Otherwise, it has the same properties and caveats as the parameterized {Float*} types.
 
-=item C<< FixedDecimal[`d, `s] >>
+=== FixedDecimal[`d, `s]
 
-Like C<< FixedBinary[`b, `s] >>, but for a C<`d> digit integer.  Or, you could think of C<`d> and C<`s> as accuracy (significant
+Like [/FixedBinary[`b, `s]], but for a {`d} digit integer.  Or, you could think of {`d} and {`s} as accuracy (significant
 figures) and decimal precision, respectively.
 
-=back
-
-=head2 Characters
+== Characters
 
 Characters are basically encoded numbers, so there's a few types here.  If you need types that handle multi-length strings, you're
-better off using L<Types::Encodings>.
+better off using [Types::Encodings].
 
-=over
-
-=item C<< Char >>
+=== Char
 
 A single character.  Unicode is supported, but it must be decoded first.  A multi-byte character that Perl thinks is two separate
 characters will fail this type.
 
-=item C<< Char[`b] >>
+=== Char[`b]
 
-A single character that fits within C<`b> bits.  Unicode is supported, but it must be decoded first.
+A single character that fits within {`b} bits.  Unicode is supported, but it must be decoded first.
 
-=back
+=end wikidoc
