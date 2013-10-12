@@ -23,7 +23,7 @@ foreach my $type (@types) {
    $bits = ceil($bits / _BASE2_LOG) if ($base eq 'BlessedInt');  # digits to bits
 
    subtest $name => sub {
-      plan tests => ($base eq 'BlessedInt' ? 15 : 111);
+      #plan tests => ($base eq 'BlessedInt' ? 15 : 111);
 
       note explain {
          name => $name,
@@ -63,21 +63,24 @@ foreach my $type (@types) {
          # -1 = global fail, 0 = use detail below, 1 = global pass
          my $pass = $bits <=> $test_bits;
 
-         if ($base eq 'UnsignedInt') {
-            numbers_test($spos+0, $type, $pass || 1);
-            numbers_test($sneg-0, $type,          0);
-            numbers_test($upos+0, $type, $pass || 1);
-            numbers_test($spos+1, $type, $pass || 1);
-            numbers_test($sneg-1, $type,          0);
-            numbers_test($upos+1, $type, $pass || 0);
-         }
-         if ($base eq 'SignedInt') {
-            numbers_test($spos+0, $type, $pass || 1);
-            numbers_test($sneg-0, $type, $pass || 1);
-            numbers_test($upos+0, $type, $pass || 0);
-            numbers_test($spos+1, $type, $pass || 0);
-            numbers_test($sneg-1, $type, $pass || 0);
-            numbers_test($upos+1, $type, $pass || 0);
+         # Some tests are unreliable for Perl numbers
+         unless ( $test_bits >= int( log(_SAFE_NUM_MAX) / log(2) ) ) {
+            if ($base eq 'UnsignedInt') {
+               numbers_test($spos+0, $type, $pass || 1);
+               numbers_test($sneg-0, $type,          0);
+               numbers_test($upos+0, $type, $pass || 1);
+               numbers_test($spos+1, $type, $pass || 1);
+               numbers_test($sneg-1, $type,          0);
+               numbers_test($upos+1, $type, $pass || 0);
+            }
+            if ($base eq 'SignedInt') {
+               numbers_test($spos+0, $type, $pass || 1);
+               numbers_test($sneg-0, $type, $pass || 1);
+               numbers_test($upos+0, $type, $pass || 0);
+               numbers_test($spos+1, $type, $pass || 0);
+               numbers_test($sneg-1, $type, $pass || 0);
+               numbers_test($upos+1, $type, $pass || 0);
+            }
          }
 
          $pass = $bits <=> $test_bits;
