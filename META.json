@@ -63,7 +63,7 @@
    "provides" : {
       "Types::Numbers" : {
          "file" : "lib/Types/Numbers.pm",
-         "version" : "0.91_02"
+         "version" : "0.91_03"
       }
    },
    "release_status" : "testing",
@@ -79,7 +79,7 @@
       },
       "x_irc" : "irc://irc.perl.org/#web-simple"
    },
-   "version" : "0.91_02",
+   "version" : "0.91_03",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.014002"

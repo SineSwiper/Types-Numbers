@@ -1,19 +1,31 @@
 Revision History for Types-Numbers
 ==================================
 
-v0.91_02 2013-10-10
+v0.91_03 2013-10-12
 -------------------
+
+[47ddbfb]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-10-12 02:08:27 -0400 (2 minutes ago)
+
+Fix all of the "long double" E notation issues
+
+[747a2a0]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-10-10 20:25:15 -0400 (30 hours ago)
+
+Release v0.91_02
 
 [faa993e]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-10 20:18:19 -0400 (5 minutes ago)
+* Date:   2013-10-10 20:18:19 -0400 (30 hours ago)
 
 Move SAFE_NUM_* constants directly to Math::BigInt
 Remove incorrect documentation on Char about UTF-8 / Latin1
 
 [983ca46]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-09 18:28:29 -0400 (26 hours ago)
+* Date:   2013-10-09 18:28:29 -0400 (2 days ago)
 
 Fix E notation problems with 64-bit integers and $_NumRange_perlsafe
 
@@ -23,13 +35,13 @@ v0.91 2013-10-06
 
 [e5706e6]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-06 16:54:13 -0400 (4 days ago)
+* Date:   2013-10-06 16:54:13 -0400 (5 days ago)
 
 Release v0.91
 
 [c5c1a06]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-06 16:41:03 -0400 (4 days ago)
+* Date:   2013-10-06 16:41:03 -0400 (5 days ago)
 
 Fix IntLike with 64-bit safe integers that are still displayed in E notation
 

@@ -90,7 +90,7 @@ sub numbers_test {
    # Parameterized integer tests only: Extra check with unblessed numbers and _SAFE_NUM_MIN/MAX
    $is_pass = 0 unless (
       $type->display_name !~ /Int\[/ || !$is_pass || $class ||
-      $val < _SAFE_NUM_MAX && $val > _SAFE_NUM_MIN && $val !~ /e/
+      $val < _SAFE_NUM_MAX && $val > _SAFE_NUM_MIN
    );
 
    my $num_length = $val =~ /^-?(\d+)(?:\.(\d+))?$/ ?

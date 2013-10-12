@@ -1,6 +1,6 @@
 package Types::Numbers;
 
-our $VERSION = '0.91_02'; # VERSION
+our $VERSION = '0.91_03'; # VERSION
 # ABSTRACT: Type constraints for numbers
 
 #############################################################################
@@ -38,17 +38,19 @@ no warnings;  # don't warn on type checks
 my $bigtwo = Math::BigFloat->new(2);
 my $bigten = Math::BigFloat->new(10);
 
-# Large 64-bit integers tend to stringify themselves in exponent notation,
-# even though the number is still pristine.  IOW, the numeric form is perfect,
-# but the string form loses information.  This can be a problem for stringified
-# inlines.
+# Large 64-bit floats (long doubles) tend to stringify themselves in exponent notation, even
+# though the number is still pristine.  IOW, the numeric form is perfect, but the string form
+# loses information.  This can be a problem for stringified inlines.
+my @df_max_int_parts = Data::Float::float_parts( Data::Float::max_integer );
+my $DF_MAX_INT = $bigtwo->copy->bpow($df_max_int_parts[1])->bmul($df_max_int_parts[2])->as_int;
+
 my $SAFE_NUM_MIN = Math::BigInt->new(
-   Data::Integer::min_signed_natint   < Data::Float::max_integer * -1 ?
-   Data::Integer::min_signed_natint   : Data::Float::max_integer * -1
+   Data::Integer::min_signed_natint   < $DF_MAX_INT * -1 ?
+   Data::Integer::min_signed_natint   : $DF_MAX_INT * -1
 );
 my $SAFE_NUM_MAX = Math::BigInt->new(
-   Data::Integer::max_unsigned_natint > Data::Float::max_integer *  1 ?
-   Data::Integer::max_unsigned_natint : Data::Float::max_integer *  1,
+   Data::Integer::max_unsigned_natint > $DF_MAX_INT *  1 ?
+   Data::Integer::max_unsigned_natint : $DF_MAX_INT *  1,
 );
 
 my $meta = __PACKAGE__->meta;
@@ -108,15 +110,16 @@ my $_NumRange_perlsafe = Type::Tiny->new(
    inlined    => sub { "$_[1] > ".$SAFE_NUM_MIN." and $_[1] < ".$SAFE_NUM_MAX },
 );
 
-### XXX: This string equality check is necessary because Math::BigInt seems to think 1.5 == 1
+### XXX: This string equality check is necessary because Math::BigInt seems to think 1.5 == 1.
+### However, this is problematic with long doubles that stringify into E notation.
 my $_IntLike = $meta->add_type(
    name       => 'IntLike',
    parent     => $_NumLike,
    library    => __PACKAGE__,
-   constraint => sub { /\d+/ and int($_) == $_ and int($_) eq $_ },
+   constraint => sub { /\d+/ and int($_) == $_ and (int($_) eq $_ or not ref($_)) },
    inlined    => sub {
       my ($self, $val) = @_;
-      $self->parent->inline_check($val)." and $val =~ /\\d+/ and int($val) == $val and int($val) eq $val";
+      $self->parent->inline_check($val)." and $val =~ /\\d+/ and int($val) == $val and (int($val) eq $val or not ref($val))";
    },
 );
 
@@ -285,7 +288,10 @@ my $_PerlSafeInt = $meta->add_type( Type::Tiny::Intersection->new(
 )->create_child_type(
    name       => 'PerlSafeInt',
    library    => __PACKAGE__,
-   inlined    => sub { "!ref($_[1]) and ".$_IntLike->inline_check($_[1]).' and '.$_NumRange_perlsafe->inline_check($_[1]) },
+   inlined    => sub {
+      my $val = $_[1];
+      "!ref($val) and $val =~ /\\d+/ and int($val) == $val and ".$_NumRange_perlsafe->inline_check($val);
+   },
 ) );
 
 my $_BlessedInt = $meta->add_type( Type::Tiny::Intersection->new(
@@ -294,7 +300,10 @@ my $_BlessedInt = $meta->add_type( Type::Tiny::Intersection->new(
 )->create_child_type(
    name       => 'BlessedInt',
    library    => __PACKAGE__,
-   inlined    => sub { Types::Standard::Object->inline_check($_[1]).' and '.$_IntLike->inline_check($_[1]) },
+   inlined    => sub {
+      my $val = $_[1];
+      Types::Standard::Object->inline_check($val)." and $val =~ /\\d+/ and int($val) == $val and int($val) eq $val";
+   },
    constraint_generator => sub {
       my $self = $Type::Tiny::parameterize_type;
       my $digits = shift;
