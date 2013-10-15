@@ -36,7 +36,6 @@
          "requires" : {
             "Data::Float" : "0.008",
             "Data::Integer" : "0.004",
-            "Math::BigFloat" : "1.59",
             "Math::BigInt" : "1.88",
             "Type::Library" : "0.008",
             "Type::Tiny" : "0.001",
@@ -63,10 +62,10 @@
    "provides" : {
       "Types::Numbers" : {
          "file" : "lib/Types/Numbers.pm",
-         "version" : "0.92"
+         "version" : "0.92_01"
       }
    },
-   "release_status" : "stable",
+   "release_status" : "testing",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/SineSwiper/Types-Numbers/issues"
@@ -79,7 +78,7 @@
       },
       "x_irc" : "irc://irc.perl.org/#web-simple"
    },
-   "version" : "0.92",
+   "version" : "0.92_01",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.014002"

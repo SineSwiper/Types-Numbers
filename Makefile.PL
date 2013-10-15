@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Data::Float" => "0.008",
     "Data::Integer" => "0.004",
-    "Math::BigFloat" => "1.59",
     "Math::BigInt" => "1.88",
     "Type::Library" => "0.008",
     "Type::Tiny" => "0.001",
@@ -38,7 +37,7 @@ my %WriteMakefileArgs = (
     "Type::Tiny" => 0,
     "base" => "2.14"
   },
-  "VERSION" => "0.92",
+  "VERSION" => "0.92_01",
   "test" => {
     "TESTS" => "t/*.t"
   }

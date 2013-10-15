@@ -28,11 +28,10 @@ no_index:
 provides:
   Types::Numbers:
     file: lib/Types/Numbers.pm
-    version: 0.92
+    version: 0.92_01
 requires:
   Data::Float: 0.008
   Data::Integer: 0.004
-  Math::BigFloat: 1.59
   Math::BigInt: 1.88
   Type::Library: 0.008
   Type::Tiny: 0.001
@@ -45,7 +44,7 @@ resources:
   bugtracker: https://github.com/SineSwiper/Types-Numbers/issues
   homepage: https://github.com/SineSwiper/Types-Numbers/wiki
   repository: git://github.com/SineSwiper/Types-Numbers.git
-version: 0.92
+version: 0.92_01
 x_Dist_Zilla:
   perl:
     version: 5.014002

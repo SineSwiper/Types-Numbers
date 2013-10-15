@@ -1,37 +1,54 @@
 Revision History for Types-Numbers
 ==================================
 
+v0.92_01 2013-10-15
+-------------------
+
+[f48c8e4]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-10-15 09:01:56 -0400 (4 minutes ago)
+
+Upgrade Math::BigFloat version to v1.65
+Fix docs (sprintf + parens around param types)
+
+
 v0.92 2013-10-12
 ----------------
 
+[ad007eb]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-10-12 23:33:24 -0400 (2 days ago)
+
+Release v0.92
+
 [5f8f597]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-12 11:59:36 -0400 (85 seconds ago)
+* Date:   2013-10-12 11:59:36 -0400 (3 days ago)
 
 Convert docs to use header hieriarchy + some additions
 
 [47ddbfb]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-12 02:08:27 -0400 (10 hours ago)
+* Date:   2013-10-12 02:08:27 -0400 (3 days ago)
 
 Fix all of the "long double" E notation issues
 
 [747a2a0]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-10 20:25:15 -0400 (2 days ago)
+* Date:   2013-10-10 20:25:15 -0400 (5 days ago)
 
 Release v0.91_02
 
 [faa993e]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-10 20:18:19 -0400 (2 days ago)
+* Date:   2013-10-10 20:18:19 -0400 (5 days ago)
 
 Move SAFE_NUM_* constants directly to Math::BigInt
 Remove incorrect documentation on Char about UTF-8 / Latin1
 
 [983ca46]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-09 18:28:29 -0400 (3 days ago)
+* Date:   2013-10-09 18:28:29 -0400 (6 days ago)
 
 Fix E notation problems with 64-bit integers and $_NumRange_perlsafe
 
@@ -41,13 +58,13 @@ v0.91 2013-10-06
 
 [e5706e6]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-06 16:54:13 -0400 (6 days ago)
+* Date:   2013-10-06 16:54:13 -0400 (9 days ago)
 
 Release v0.91
 
 [c5c1a06]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-06 16:41:03 -0400 (6 days ago)
+* Date:   2013-10-06 16:41:03 -0400 (9 days ago)
 
 Fix IntLike with 64-bit safe integers that are still displayed in E notation
 
