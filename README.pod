@@ -120,11 +120,12 @@ In this case, C<<< ...992 >>> would pass and C<<< ...993 >>> would fail.
 off point is C<<< ...992 >>>, inclusive.)
 
 Be aware that Perls compiled with "long doubles" have a unique problem with storage and information loss: their number form maintains
-accuracy while their stringified form loses information.  For example, take the max safe integer for a long double:
+accuracy while their (default) stringified form loses information.  For example, take the max safe integer for a long double:
 
     $num = 18446744073709551615;
-    say $num;  # 1.84467440737095516e+19
+    say $num;                 # 1.84467440737095516e+19
     say $num == 18446744073709551615;  # true, so the full number is still there
+    say sprintf('%u', $num);  # 18446744073709551615
 
 These numbers are considered safe for storage.  If this is not preferred, consider a simple C<<< /e/ >>> check for stringified E notation.
 
@@ -194,12 +195,12 @@ The bit breakdown follows traditional IEEE 754 floating point standards.  For ex
 Unlike the C<<< *Int >>> types, if Perl's native number cannot support all dimensions of the floating-point number without losing
 information, then unblessed numbers are completely off the table.  For example, assuming a 32-bit machine:
 
-    UnsignedInt[64]->check( 0 )        # pass
-    UnsignedInt[64]->check( 2 ** 30 )  # pass
-    UnsignedInt[64]->check( 2 ** 60 )  # fail, because 32-bit NVs can't safely hold it
+    (UnsignedInt[64])->check( 0 )        # pass
+    (UnsignedInt[64])->check( 2 ** 30 )  # pass
+    (UnsignedInt[64])->check( 2 ** 60 )  # fail, because 32-bit NVs can't safely hold it
  
-    FloatBinary[64, 11]->check( 0 )    # fail
-    FloatBinary[64, 11]->check( $any_unblessed_number )  # fail
+    (FloatBinary[64, 11])->check( 0 )    # fail
+    (FloatBinary[64, 11])->check( $any_unblessed_number )  # fail
 
 =head3 FloatDecimal[`d, `e]
 
