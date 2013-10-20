@@ -17,10 +17,10 @@ use Type::Tiny::Intersection;
 use Type::Tiny::Union;
 use Types::Standard v0.030 ();  # support for Error::TypeTiny
 
-use Scalar::Util v1.20 (qw(blessed looks_like_number));  # support for overloaded/blessed looks_like_number
+use Scalar::Util 1.20 (qw(blessed looks_like_number));  # support for overloaded/blessed looks_like_number
 use POSIX 'ceil';
-use Math::BigInt;
-use Math::BigFloat v1.65;  # earliest version that passes tests
+use Math::BigInt   1.92;  # somewhat a stab in the dark for a passable version
+use Math::BigFloat 1.65;  # earliest version that passes tests
 use Data::Float;
 use Data::Integer;
 
