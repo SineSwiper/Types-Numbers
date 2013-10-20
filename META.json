@@ -36,10 +36,13 @@
          "requires" : {
             "Data::Float" : "0.008",
             "Data::Integer" : "0.004",
-            "Math::BigInt" : "1.88",
+            "Error::TypeTiny" : "0.030",
+            "Math::BigFloat" : "1.65",
+            "Math::BigInt" : "1.92",
+            "Scalar::Util" : "1.20",
             "Type::Library" : "0.008",
             "Type::Tiny" : "0.001",
-            "Types::Standard" : "0.001",
+            "Types::Standard" : "v0.30.0",
             "constant" : "1.16",
             "perl" : "v5.8.8",
             "warnings" : "1.05_01"
@@ -62,10 +65,10 @@
    "provides" : {
       "Types::Numbers" : {
          "file" : "lib/Types/Numbers.pm",
-         "version" : "0.92_01"
+         "version" : "0.93"
       }
    },
-   "release_status" : "testing",
+   "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/SineSwiper/Types-Numbers/issues"
@@ -78,7 +81,7 @@
       },
       "x_irc" : "irc://irc.perl.org/#web-simple"
    },
-   "version" : "0.92_01",
+   "version" : "0.93",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.014002"
@@ -415,18 +418,6 @@
             "class" : "Dist::Zilla::Plugin::Clean",
             "name" : "@Author::BBYRD/Clean",
             "version" : "0.07"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::RemovePrereqs",
-            "config" : {
-               "Dist::Zilla::Plugin::RemovePrereqs" : {
-                  "modules_to_remove" : [
-                     "Type::Exception"
-                  ]
-               }
-            },
-            "name" : "RemovePrereqs",
-            "version" : "4.300039"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

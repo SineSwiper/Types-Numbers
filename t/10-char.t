@@ -34,7 +34,7 @@ sub char_test {
    diag $error_msg if ($error_msg && !$result);
 }
 
-# Char[48]/Char[64] is going to accept every single character, because UTF-8 is 6 bytes.
+# Char[48]/Char[64] is going to accept every single character, because UTF-8 tops out at 6 bytes.
 # Ditto for Char[32], since UTF-8 currently doesn't have anything beyond the U+1003FF codepage.
 foreach my $bits (4,6,7,8,16,24,32,48,64,9999) {
    my $type = $bits == 9999 ? Char : Char[$bits];

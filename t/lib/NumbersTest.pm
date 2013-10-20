@@ -79,6 +79,9 @@ our $Fnan  = Math::BigFloat->bnan();
 our $Fpinf = Math::BigFloat->binf('+');
 our $Fninf = Math::BigFloat->binf('-');
 
+our $Win32_INF_TODO = 'Problems with Win32, INF, and looks_like_number (see RT#89423)';
+#$Win32_INF_TODO = '' unless ($^O eq 'MSWin32');
+
 sub numbers_test {
    my ($val, $type, $is_pass) = @_;
    no warnings 'uninitialized';
@@ -92,6 +95,10 @@ sub numbers_test {
       $type->display_name !~ /Int\[/ || !$is_pass || $class ||
       $val < _SAFE_NUM_MAX && $val > _SAFE_NUM_MIN
    );
+
+   # TODO these tests
+   local $TODO = 'Problems with Win32, INF, and looks_like_number (see RT#89423)'
+      if ($^O eq 'MSWin32' && $val =~ /IN[DF]/i && Data::Float::float_is_infinite($val));
 
    my $num_length = $val =~ /^-?(\d+)(?:\.(\d+))?$/ ?
       join '.', length $1, (length $2 || 0) :
@@ -126,3 +133,5 @@ sub numbers_test {
    diag $error_msg if ($error_msg && !$result);
    #diag $error_msg if ($error_msg);
 }
+
+1;
