@@ -15,7 +15,7 @@ our @EXPORT_OK = ();
 use Type::Library -base;
 use Type::Tiny::Intersection;
 use Type::Tiny::Union;
-use Types::Standard ();
+use Types::Standard v0.030 ();  # support for Error::TypeTiny
 
 use Scalar::Util v1.20 (qw(blessed looks_like_number));  # support for overloaded/blessed looks_like_number
 use POSIX 'ceil';
@@ -28,7 +28,7 @@ use constant {
    _BASE2_LOG => log(2) / log(10),
 };
 
-sub _croak ($;@) { require Type::Exception; goto \&Type::Exception::croak }
+sub _croak ($;@) { require Error::TypeTiny; goto \&Error::TypeTiny::croak }
 
 no warnings;  # don't warn on type checks
 
@@ -91,11 +91,11 @@ my $_NumRange = $meta->add_type(
          library    => __PACKAGE__,
          constraint => sub {
             my $val = $_;
-            $val >= $min and $val <= $max;
+            $val >= $min && $val <= $max;
          },
          inlined    => sub {
             my ($self, $val) = @_;
-            $self->parent->inline_check($val)." && $val >= $Imin and $val <= $Imax";
+            $self->parent->inline_check($val)." && $val >= $Imin && $val <= $Imax";
          },
       );
    },
@@ -106,8 +106,8 @@ my $_NumRange_perlsafe = Type::Tiny->new(
    display_name => "_NumRange_perlsafe",
    parent     => $_NumLike,
    # no equals because MAX+1 = MAX after truncation
-   constraint => sub { $_ > $SAFE_NUM_MIN and $_ < $SAFE_NUM_MAX },
-   inlined    => sub { "$_[1] > ".$SAFE_NUM_MIN." and $_[1] < ".$SAFE_NUM_MAX },
+   constraint => sub { $_ > $SAFE_NUM_MIN && $_ < $SAFE_NUM_MAX },
+   inlined    => sub { "$_[1] > ".$SAFE_NUM_MIN." && $_[1] < ".$SAFE_NUM_MAX },
 );
 
 ### XXX: This string equality check is necessary because Math::BigInt seems to think 1.5 == 1.
@@ -116,10 +116,10 @@ my $_IntLike = $meta->add_type(
    name       => 'IntLike',
    parent     => $_NumLike,
    library    => __PACKAGE__,
-   constraint => sub { /\d+/ and int($_) == $_ and (int($_) eq $_ or not ref($_)) },
+   constraint => sub { /\d+/ && int($_) == $_ && (int($_) eq $_ || !ref($_)) },
    inlined    => sub {
       my ($self, $val) = @_;
-      $self->parent->inline_check($val)." and $val =~ /\\d+/ and int($val) == $val and (int($val) eq $val or not ref($val))";
+      $self->parent->inline_check($val)." && $val =~ /\\d+/ && int($val) == $val && (int($val) eq $val || !ref($val))";
    },
 );
 
@@ -150,15 +150,15 @@ my $_BlessedNum = $meta->add_type( Type::Tiny::Intersection->new(
          constraint => sub {
             my $val = $_;
 
-            $val->can('accuracy')  and $val->accuracy  >= $digits or
-            $val->can('div_scale') and $val->div_scale >= $digits;
+            $val->can('accuracy')  && $val->accuracy  >= $digits ||
+            $val->can('div_scale') && $val->div_scale >= $digits;
          },
          inlined    => sub {
             my ($self, $val) = @_;
 
-            $parent->inline_check($val).' and ( '.
-               "$val->can('accuracy')  and $val->accuracy  >= $digits or ".
-               "$val->can('div_scale') and $val->div_scale >= $digits ".
+            $parent->inline_check($val).' && ( '.
+               "$val->can('accuracy')  && $val->accuracy  && $val->accuracy  >= $digits || ".
+               "$val->can('div_scale') && $val->div_scale && $val->div_scale >= $digits ".
             ')';
          },
       );
@@ -172,13 +172,13 @@ my $_NaN = $meta->add_type(
    constraint => sub {
       my $val = $_;
 
-      Types::Standard::Object->check($val) and $val->can('is_nan') and $val->is_nan or
+      Types::Standard::Object->check($val) && $val->can('is_nan') && $val->is_nan ||
       Data::Float::float_is_nan($val);
    },
    inlined    => sub {
       my ($self, $val) = @_;
-      $self->parent->inline_check($val).' and ('.
-      '   '.Types::Standard::Object->inline_check($val)." and $val->can('is_nan') and $val->is_nan or".
+      $self->parent->inline_check($val).' && ('.
+      '   '.Types::Standard::Object->inline_check($val)." && $val->can('is_nan') && $val->is_nan ||".
       '   '."Data::Float::float_is_nan($val)".
       ')';
    },
@@ -191,13 +191,13 @@ my $_Inf = $meta->add_type(
    constraint => sub {
       my $val = $_;
 
-      Types::Standard::Object->check($val) and $val->can('is_inf') and ($val->is_inf('+') or $val->is_inf('-')) or
+      Types::Standard::Object->check($val) && $val->can('is_inf') && ($val->is_inf('+') || $val->is_inf('-')) ||
       Data::Float::float_is_infinite($val);
    },
    inlined    => sub {
       my ($self, $val) = @_;
-      $self->parent->inline_check($val).' and ('.
-      '   '.Types::Standard::Object->inline_check($val)." and $val->can('is_inf') and ($val->is_inf('+') or $val->is_inf('-')) or".
+      $self->parent->inline_check($val).' && ('.
+      '   '.Types::Standard::Object->inline_check($val)." && $val->can('is_inf') && ($val->is_inf('+') || $val->is_inf('-')) ||".
       '   '."Data::Float::float_is_infinite($val)".
       ')';
    },
@@ -213,15 +213,15 @@ my $_Inf = $meta->add_type(
          constraint => sub {
             my $val = $_;
 
-            Types::Standard::Object->check($val) and $val->can('is_inf') and $val->is_inf($sign) or
-            Data::Float::float_is_infinite($val) and Data::Float::float_sign($val) eq $sign;
+            Types::Standard::Object->check($val) && $val->can('is_inf') && $val->is_inf($sign) ||
+            Data::Float::float_is_infinite($val) && Data::Float::float_sign($val) eq $sign;
          },
          inlined    => sub {
             my ($self, $val) = @_;
 
-            $self->parent->inline_check($val).' and ( '.
-               Types::Standard::Object->inline_check($val)." and $val->can('is_inf') and $val->is_inf('$sign') or ".
-               "Data::Float::float_is_infinite($val) and Data::Float::float_sign($val) eq '$sign' ".
+            $self->parent->inline_check($val).' && ( '.
+               Types::Standard::Object->inline_check($val)." && $val->can('is_inf') && $val->is_inf('$sign') || ".
+               "Data::Float::float_is_infinite($val) && Data::Float::float_sign($val) eq '$sign' ".
             ')';
          },
       );
@@ -234,19 +234,19 @@ my $_NaNInf = Type::Tiny::Union->new(
 )->create_child_type(
    name       => 'NaNInf',
    constraint => sub {
-      # looks_like_number($_) and
-      Types::Standard::Object->check($_) and (
-         $_->can('is_nan') and $_->is_nan or
-         $_->can('is_inf') and ($_->is_inf('+') or $_->is_inf('-'))
-      ) or Data::Float::float_is_nan($_) or Data::Float::float_is_infinite($_)
+      # looks_like_number($_) &&
+      Types::Standard::Object->check($_) && (
+         $_->can('is_nan') && $_->is_nan ||
+         $_->can('is_inf') && ($_->is_inf('+') || $_->is_inf('-'))
+      ) || Data::Float::float_is_nan($_) || Data::Float::float_is_infinite($_)
    },
    inlined    => sub {
       my ($self, $val) = @_;
-      # looks_like_number($val) and
-      Types::Standard::Object->inline_check($val)." and ( ".
-         "$val->can('is_nan') and $val->is_nan or ".
-         "$val->can('is_inf') and ($val->is_inf('+') or $val->is_inf('-')) ".
-      ") or Data::Float::float_is_nan($val) or Data::Float::float_is_infinite($val)";
+      # looks_like_number($val) &&
+      Types::Standard::Object->inline_check($val)." && ( ".
+         "$val->can('is_nan') && $val->is_nan || ".
+         "$val->can('is_inf') && ($val->is_inf('+') || $val->is_inf('-')) ".
+      ") || Data::Float::float_is_nan($val) || Data::Float::float_is_infinite($val)";
    },
 );
 
@@ -290,7 +290,7 @@ my $_PerlSafeInt = $meta->add_type( Type::Tiny::Intersection->new(
    library    => __PACKAGE__,
    inlined    => sub {
       my $val = $_[1];
-      "!ref($val) and $val =~ /\\d+/ and int($val) == $val and ".$_NumRange_perlsafe->inline_check($val);
+      "defined $val && !ref($val) && $val =~ /\\d+/ && int($val) == $val && ".$_NumRange_perlsafe->inline_check($val);
    },
 ) );
 
@@ -302,7 +302,7 @@ my $_BlessedInt = $meta->add_type( Type::Tiny::Intersection->new(
    library    => __PACKAGE__,
    inlined    => sub {
       my $val = $_[1];
-      Types::Standard::Object->inline_check($val)." and $val =~ /\\d+/ and int($val) == $val and int($val) eq $val";
+      Types::Standard::Object->inline_check($val)." && $val =~ /\\d+/ && int($val) == $val && int($val) eq $val";
    },
    constraint_generator => sub {
       my $self = $Type::Tiny::parameterize_type;
@@ -323,8 +323,10 @@ my $_BlessedInt = $meta->add_type( Type::Tiny::Intersection->new(
             }
          },
          inlined    => sub {
-            $_IntLike->inline_check($_[1]).' && '.$_BlessedNum_param->inline_check($_[1]).' && do { '.
-               'my $num = '.$_[1].'; '.
+            my $val = $_[1];
+            $_BlessedNum_param->inline_check($val).' && '.
+            "$val =~ /\\d+/ && int($val) == $val && int($val) eq $val && do { ".
+               'my $num = '.$val.'; '.
                '$num =~ s/\D+//g; '.
                'length($num) <= '.$digits.' '.
             '}';
@@ -342,7 +344,7 @@ $meta->add_type( Type::Tiny::Union->new(
    library    => __PACKAGE__,
    inlined    => sub {
       my $val = $_[1];
-      $_IntLike->inline_check($val).' and ('.
+      $_IntLike->inline_check($val).' && ('.
          $_NumRange_perlsafe->inline_check($val).' || '.Types::Standard::Object->inline_check($val).
       ')';
    },
@@ -373,10 +375,10 @@ $meta->add_type(
    name       => 'UnsignedInt',
    parent     => $_IntLike,
    library    => __PACKAGE__,
-   constraint => sub { $_IntLike->check($_) and $_ >= 0 and ($_PerlSafeInt->check($_) or $_BlessedNum->check($_)) },
+   constraint => sub { $_IntLike->check($_) && $_ >= 0 && ($_PerlSafeInt->check($_) || $_BlessedNum->check($_)) },
    inlined    => sub {
       my $val = $_[1];
-      $_IntLike->inline_check($val)." and $val >= 0 and (".
+      $_IntLike->inline_check($val)." && $val >= 0 && (".
          $_NumRange_perlsafe->inline_check($val).' || '.Types::Standard::Object->inline_check($val).
       ')';
    },
@@ -392,7 +394,7 @@ $meta->add_type(
       # inline will already have the IntLike check, and maybe not need the extra NumRange check
       my $perlsafe_inline = $min >= $SAFE_NUM_MIN && $max <= $SAFE_NUM_MAX ?
          sub { Types::Standard::Str->inline_check($_[0]) } :
-         sub { '('.Types::Standard::Str->inline_check($_[0]).' and '.$_NumRange_perlsafe->inline_check($_[0]).')' }
+         sub { '('.Types::Standard::Str->inline_check($_[0]).' && '.$_NumRange_perlsafe->inline_check($_[0]).')' }
       ;
 
       Type::Tiny->new(
@@ -400,13 +402,13 @@ $meta->add_type(
          parent     => $self,
          library    => __PACKAGE__,
          constraint => sub {
-            $_IntLike->check($_) and $_NumRange_param->check($_) and
-            ($_PerlSafeInt->check($_) or $_BlessedNum_param->check($_));
+            $_IntLike->check($_) && $_NumRange_param->check($_) &&
+            ($_PerlSafeInt->check($_) || $_BlessedNum_param->check($_));
          },
          inlined    => sub {
             my $val = $_[1];
-            $_IntLike->inline_check($val).' and '.$_NumRange_param->inline_check($val).' and '.
-            '('.$perlsafe_inline->($val).' or '.$_BlessedNum_param->inline_check($val).')';
+            $_IntLike->inline_check($val).' && '.$_NumRange_param->inline_check($val).' && '.
+            '('.$perlsafe_inline->($val).' || '.$_BlessedNum_param->inline_check($val).')';
          },
       );
    },
@@ -435,10 +437,10 @@ my $_BlessedFloat = $meta->add_type(
          display_name => "BlessedFloat[$digits]",
          parent     => $self,
          library    => __PACKAGE__,
-         constraint => sub { $_BlessedNum_param->check($_) and blessed($_)->new(1.2) == 1.2 },
+         constraint => sub { $_BlessedNum_param->check($_) && blessed($_)->new(1.2) == 1.2 },
          inlined    => sub {
             my ($self, $val) = @_;
-            $_BlessedNum_param->inline_check($val)." and Scalar::Util::blessed($val)\->new(1.2) == 1.2";
+            $_BlessedNum_param->inline_check($val)." && Scalar::Util::blessed($val)\->new(1.2) == 1.2";
          },
       );
    },
@@ -448,11 +450,11 @@ my $_PerlSafeFloat = $meta->add_type(
    name       => 'PerlSafeFloat',
    parent     => $_PerlNum,
    library    => __PACKAGE__,
-   constraint => sub { $_NumRange_perlsafe->check($_) or Data::Float::float_is_nan($_) or Data::Float::float_is_infinite($_) },
+   constraint => sub { $_NumRange_perlsafe->check($_) || Data::Float::float_is_nan($_) || Data::Float::float_is_infinite($_) },
    inlined    => sub {
       my ($self, $val) = @_;
-      $self->parent->inline_check($val).' and ('.
-         $_NumRange_perlsafe->inline_check($val)." or Data::Float::float_is_nan($val) or Data::Float::float_is_infinite($val)".
+      $self->parent->inline_check($val).' && ('.
+         $_NumRange_perlsafe->inline_check($val)." || Data::Float::float_is_nan($val) || Data::Float::float_is_infinite($val)".
       ')';
    },
 );
@@ -465,11 +467,11 @@ my $_FloatSafeNum = $meta->add_type( Type::Tiny::Union->new(
    library    => __PACKAGE__,
    inlined    => sub {
       my ($self, $val) = @_;
-      $self->parent->inline_check($val).' and ('.
-         "!ref($val) and (".
-            $_NumRange_perlsafe->inline_check($val)." or Data::Float::float_is_nan($val) or Data::Float::float_is_infinite($val)".
-         ') or '.
-         Types::Standard::Object->inline_check($val)." and Scalar::Util::blessed($val)->new(1.2) == 1.2".
+      $self->parent->inline_check($val).' && ('.
+         "!ref($val) && (".
+            $_NumRange_perlsafe->inline_check($val)." || Data::Float::float_is_nan($val) || Data::Float::float_is_infinite($val)".
+         ') || '.
+         Types::Standard::Object->inline_check($val)." && Scalar::Util::blessed($val)->new(1.2) == 1.2".
       ')';
    },
 ) );
@@ -482,12 +484,12 @@ my $_RealSafeNum = $meta->add_type( Type::Tiny::Intersection->new(
    library    => __PACKAGE__,
    inlined    => sub {
       my ($self, $val) = @_;
-      $_NumLike->inline_check($val).' and ('.
-         "( !ref($val) and ".$_NumRange_perlsafe->inline_check($val)." and not (".
-            "Data::Float::float_is_nan($val) or Data::Float::float_is_infinite($val))".
-         ') or ('.
-            Types::Standard::Object->inline_check($val)." and Scalar::Util::blessed($val)->new(1.2) == 1.2 and ".
-            "not ($val->can('is_nan') and $val->is_nan or $val->can('is_inf') and ($val->is_inf('+') or $val->is_inf('-')) )".
+      $_NumLike->inline_check($val).' && ('.
+         "( !ref($val) && ".$_NumRange_perlsafe->inline_check($val)." && not (".
+            "Data::Float::float_is_nan($val) || Data::Float::float_is_infinite($val))".
+         ') || ('.
+            Types::Standard::Object->inline_check($val)." && Scalar::Util::blessed($val)->new(1.2) == 1.2 && ".
+            "not ($val->can('is_nan') && $val->is_nan || $val->can('is_inf') && ($val->is_inf('+') || $val->is_inf('-')) )".
          ')'.
       ')';
    },
@@ -502,14 +504,14 @@ sub __real_constraint_generator {
 
    if ($no_naninf) {
       return $is_perl_safe ?
-         sub { ( $_PerlNum->check($_) or $_BlessedFloat_param->check($_) ) and $_NumRange_param->check($_) } :
-         sub { $_BlessedFloat_param->check($_) and $_NumRange_param->check($_) }
+         sub { ( $_PerlNum->check($_) || $_BlessedFloat_param->check($_) ) && $_NumRange_param->check($_) } :
+         sub { $_BlessedFloat_param->check($_) && $_NumRange_param->check($_) }
       ;
    }
    else {
       return $is_perl_safe ?
-         sub { ( $_PerlNum->check($_) or $_BlessedFloat_param->check($_) ) and $_NumRange_param->check($_) or $_NaNInf->check($_) } :
-         sub { $_BlessedFloat_param->check($_) and ( $_NumRange_param->check($_) or $_NaNInf->check($_) ); }
+         sub { ( $_PerlNum->check($_) || $_BlessedFloat_param->check($_) ) && $_NumRange_param->check($_) || $_NaNInf->check($_) } :
+         sub { $_BlessedFloat_param->check($_) && ( $_NumRange_param->check($_) || $_NaNInf->check($_) ); }
       ;
    }
 }
@@ -702,7 +704,7 @@ $meta->add_type(
    constraint => sub { length($_) == 1 },  # length() will do a proper Unicode char length
    inlined    => sub {
       my ($self, $val) = @_;
-      $self->parent->inline_check($val)." and length($val) == 1";
+      $self->parent->inline_check($val)." && length($val) == 1";
    },
    constraint_generator => sub {
       my $self = $Type::Tiny::parameterize_type;
@@ -716,7 +718,7 @@ $meta->add_type(
          constraint => sub { ord($_) < 2**$bits },
          inlined    => sub {
             my $val = $_[1];
-            Types::Standard::Str->inline_check($val)." and length($val) == 1 and ord($val) < 2**$bits";
+            Types::Standard::Str->inline_check($val)." && length($val) == 1 && ord($val) < 2**$bits";
          },
       );
    },
