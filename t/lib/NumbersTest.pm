@@ -79,9 +79,6 @@ our $Fnan  = Math::BigFloat->bnan();
 our $Fpinf = Math::BigFloat->binf('+');
 our $Fninf = Math::BigFloat->binf('-');
 
-our $Win32_INF_TODO = 'Problems with Win32, INF, and looks_like_number (see RT#89423)';
-#$Win32_INF_TODO = '' unless ($^O eq 'MSWin32');
-
 sub numbers_test {
    my ($val, $type, $is_pass) = @_;
    no warnings 'uninitialized';

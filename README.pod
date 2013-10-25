@@ -277,10 +277,6 @@ Please report any bugs or feature requests via L<https://github.com/SineSwiper/T
 
 Brendan Byrd <BBYRD@CPAN.org>
 
-=head1 CONTRIBUTOR
-
-Brendan Byrd <bbyrd@cpan.org>
-
 =head1 COPYRIGHT AND LICENSE
 
 This software is Copyright (c) 2013 by Brendan Byrd.
