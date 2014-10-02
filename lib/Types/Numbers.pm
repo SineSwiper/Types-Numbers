@@ -1,5 +1,6 @@
 package Types::Numbers;
 
+# AUTHORITY
 # VERSION
 # ABSTRACT: Type constraints for numbers
 
