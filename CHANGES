@@ -1,92 +1,51 @@
 Revision History for Types-Numbers
 ==================================
 
+v0.94 2014-10-18
+----------------
+
+[d83b874]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-10-01 23:38:13 -0400 (2 weeks ago)
+
+Minor DZIL fixes, including IRC resource (fixes #1)
+
+[742b3f8]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-10-25 08:08:14 -0400 (12 months ago)
+
+Minor cleanup
+
+
 v0.93 2013-10-20
 ----------------
 
 [8e53c1b]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-20 11:25:37 -0400 (3 hours ago)
+* Date:   2013-10-20 11:25:37 -0400 (12 months ago)
 
 Change inf tests to TODO tests for Win32/INF/looks_like_number bug
 Fix up some v-string requirement errors
 
 [720b62d]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-20 10:58:16 -0400 (3 hours ago)
+* Date:   2013-10-20 10:58:16 -0400 (12 months ago)
 
 Convert lower priority and/or to &&/||
 Fix uninitialized warnings from perl -w and BlessedNum
 
 [8406218]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-15 09:21:41 -0400 (5 days ago)
+* Date:   2013-10-15 09:21:41 -0400 (1 year ago)
 
 Release v0.92_01
 
 [f48c8e4]
 * Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-15 09:01:56 -0400 (5 days ago)
+* Date:   2013-10-15 09:01:56 -0400 (1 year ago)
 
 Upgrade Math::BigFloat version to v1.65
 Fix docs (sprintf + parens around param types)
-
-
-v0.92 2013-10-12
-----------------
-
-[ad007eb]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-12 23:33:24 -0400 (8 days ago)
-
-Release v0.92
-
-[5f8f597]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-12 11:59:36 -0400 (8 days ago)
-
-Convert docs to use header hieriarchy + some additions
-
-[47ddbfb]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-12 02:08:27 -0400 (9 days ago)
-
-Fix all of the "long double" E notation issues
-
-[747a2a0]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-10 20:25:15 -0400 (10 days ago)
-
-Release v0.91_02
-
-[faa993e]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-10 20:18:19 -0400 (10 days ago)
-
-Move SAFE_NUM_* constants directly to Math::BigInt
-Remove incorrect documentation on Char about UTF-8 / Latin1
-
-[983ca46]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-09 18:28:29 -0400 (11 days ago)
-
-Fix E notation problems with 64-bit integers and $_NumRange_perlsafe
-
-
-v0.91 2013-10-06
-----------------
-
-[e5706e6]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-06 16:54:13 -0400 (2 weeks ago)
-
-Release v0.91
-
-[c5c1a06]
-* Author: Brendan Byrd <Perl@ResonatorSoft.org>
-* Date:   2013-10-06 16:41:03 -0400 (2 weeks ago)
-
-Fix IntLike with 64-bit safe integers that are still displayed in E notation
 
 
 ===================================

@@ -1,6 +1,7 @@
 package Types::Numbers;
 
-our $VERSION = '0.93'; # VERSION
+our $AUTHORITY = 'cpan:BBYRD'; # AUTHORITY
+our $VERSION = '0.94'; # VERSION
 # ABSTRACT: Type constraints for numbers
 
 #############################################################################
@@ -730,7 +731,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -740,8 +741,6 @@ Types::Numbers - Type constraints for numbers
 
 Because we deal with numbers every day in our programs and modules, this is an extensive L<Type::Tiny> library of number validations.
 Like L<Type::Tiny>, these types work with all modern OO platforms and as a standalone type system.
-
-=encoding utf8
 
 =head1 TYPES
 
@@ -972,7 +971,7 @@ A single character that fits within C<<< `b >>> bits.  Unicode is supported, but
 
 =head1 AVAILABILITY
 
-The project homepage is L<https://github.com/SineSwiper/Types-Numbers/wiki>.
+The project homepage is L<https://github.com/SineSwiper/Types-Numbers>.
 
 The latest version of this module is available from the Comprehensive Perl
 Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
@@ -1006,10 +1005,6 @@ Please report any bugs or feature requests via L<https://github.com/SineSwiper/T
 =head1 AUTHOR
 
 Brendan Byrd <BBYRD@CPAN.org>
-
-=head1 CONTRIBUTOR
-
-Brendan Byrd <bbyrd@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
